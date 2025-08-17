@@ -18,7 +18,10 @@
   };
 
   # Enable flakes
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -29,6 +32,7 @@
   # Essential packages for all systems
   environment.systemPackages = with pkgs; [
     git
+    openssl
     wget
   ];
 
