@@ -34,13 +34,15 @@
           }
         );
       };
+      
+      jvmOpts = "-Xms2G -Xmx6G -Dfml.readTimeout=180";
 
       serverProperties = {
         server-port = 25566;
         difficulty = 3;
-        gamemode = 1;
+        gamemode = 0;
         max-players = 5;
-        motd = "NixOS Minecraft server!";
+        motd = "tim's NixOS server";
         white-list = true;
         #enable-rcon = true;
       };

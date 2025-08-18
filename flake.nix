@@ -40,27 +40,27 @@
             ./modules/common.nix
             ./modules/desktop.nix
             ./modules/development.nix
-            ./modules/minecraft.nix
-            ./modules/nginx.nix
             ./users/tim.nix
-            nix-minecraft.nixosModules.minecraft-servers
             {
               nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
             }
           ];
         };
 
-        # Placeholder for homelab
-        # nucbox = nixpkgs.lib.nixosSystem {
-        #   system = "x86_64-linux";
-        #   specialArgs = { inherit inputs; };
-        #   modules = [
-        #     ./hosts/server
-        #     ./modules/common.nix
-        #     ./modules/server.nix
-        #     ./users/tim.nix
-        #   ];
-        # };
+        # Nucbox server
+        nucbox = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            nix-minecraft.nixosModules.minecraft-servers
+            inputs.sops-nix.nixosModules.sops
+            ./hosts/nucbox
+            ./modules/common.nix
+            ./modules/minecraft.nix
+            ./modules/nginx.nix
+            ./users/tim.nix
+          ];
+        };
       };
     };
 }

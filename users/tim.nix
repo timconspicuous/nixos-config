@@ -7,6 +7,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "minecraft"
     ];
 
     # User-specific packages can go here if needed

@@ -14,10 +14,10 @@ creation_rules:
       - age:
           - *desktop
 
-  #- path_regex: secrets/nucbox.ya?ml$
-  #  key_groups:
-  #    - age:
-  #        - *nucbox
+  - path_regex: secrets/nucbox.ya?ml$
+    key_groups:
+      - age:
+          - *nucbox
 
   - path_regex: secrets/common.ya?ml$
     key_groups:
