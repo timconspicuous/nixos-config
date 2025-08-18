@@ -41,6 +41,7 @@
             ./modules/desktop.nix
             ./modules/development.nix
             ./modules/minecraft.nix
+            ./modules/nginx.nix
             ./users/tim.nix
             nix-minecraft.nixosModules.minecraft-servers
             {
