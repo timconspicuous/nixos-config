@@ -9,14 +9,6 @@ with lib;
 
 let
   cfg = config.services.homelab.auth;
-
-  # Read secrets from files (relative to flake root)
-  lldapJwtSecret = builtins.readFile ./secrets/lldap-jwt-secret;
-  lldapLdapUserPassword = builtins.readFile ./secrets/lldap-ldap-user-password;
-  autheliaJwtSecret = builtins.readFile ./secrets/authelia-jwt-secret;
-  autheliaSessionSecret = builtins.readFile ./secrets/authelia-session-secret;
-  autheliaStorageEncryptionKey = builtins.readFile ./secrets/authelia-storage-encryption-key;
-
 in
 {
   options.services.homelab.auth = {
@@ -82,20 +74,48 @@ in
   };
 
   config = mkIf cfg.enable {
+    # SOPS configuration
+    sops.secrets = {
+      "authelia-jwt-secret" = {
+        sopsFile = ./secrets/common.yaml;
+        owner = "authelia";
+        group = "authelia";
+        mode = "0400";
+      };
+      "authelia-session-secret" = {
+        sopsFile = ./secrets/common.yaml;
+        owner = "authelia";
+        mode = "0400";
+      };
+      "authelia-storage-encryption-key" = {
+        sopsFile = ./secrets/common.yaml;
+        owner = "authelia";
+        mode = "0400";
+      };
+      "lldap-jwt-secret" = {
+        sopsFile = ./secrets/common.yaml;
+        owner = "lldap";
+        mode = "0400";
+      };
+      "lldap-ldap-user-password" = {
+        sopsFile = ./secrets/common.yaml;
+        owner = "lldap";
+        mode = "0400";
+      };
+    };
+
     # LLDAP Configuration
     services.lldap = mkIf cfg.lldap.enable {
       enable = true;
       settings = {
+        # Load SOPS secrets
+        jwt_secret = config.sops.secrets.lldap-jwt-secret.path;
+        ldap_user_pass = config.sops.secrets.lldap-ldap-user-password.path;
+
         http_port = cfg.lldap.port;
         ldap_port = cfg.lldap.ldapPort;
 
         ldap_base_dn = cfg.lldap.baseDn;
-
-        # JWT secret for session management
-        jwt_secret = lldapJwtSecret;
-
-        # LDAP user password
-        ldap_user_pass = lldapLdapUserPassword;
 
         # Database settings (using SQLite by default)
         database_url = "sqlite:///var/lib/lldap/users.db";
@@ -116,6 +136,13 @@ in
     services.authelia.instances.main = mkIf cfg.authelia.enable {
       enable = true;
 
+      # Load SOPS secrets
+      secrets = {
+        jwtSecretFile = config.sops.secrets.authelia-jwt-secret.path;
+        storageEncryptionKeyFile = config.sops.secrets.authelia-storage-encryption-key.path;
+        sessionSecretFile = config.sops.secrets.authelia-session-secret.path;
+      };
+
       settings = {
         # Server configuration
         server = {
@@ -131,9 +158,6 @@ in
           format = "text";
         };
 
-        # JWT configuration
-        jwt_secret = autheliaJwtSecret;
-
         # Default redirection URL
         default_redirection_url = "https://${cfg.domain}";
 
@@ -142,7 +166,6 @@ in
           name = "authelia_session";
           domain = cfg.domain;
           same_site = "lax";
-          secret = autheliaSessionSecret;
           expiration = "1h";
           inactivity = "5m";
           remember_me_duration = "1M";
@@ -153,7 +176,6 @@ in
           local = {
             path = "/var/lib/authelia/db.sqlite3";
           };
-          encryption_key = autheliaStorageEncryptionKey;
         };
 
         # LDAP Authentication Backend (connecting to LLDAP)
@@ -176,7 +198,6 @@ in
             mail_attribute = "mail";
             display_name_attribute = "displayName";
             user = "uid=${cfg.lldap.adminUsername},ou=people,${cfg.lldap.baseDn}";
-            password = lldapLdapUserPassword;
           };
         };
 
