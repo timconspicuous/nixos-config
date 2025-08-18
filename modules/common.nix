@@ -32,7 +32,9 @@
   # Essential packages for all systems
   environment.systemPackages = with pkgs; [
     git
+    #gnupg
     openssl
+    sops
     wget
   ];
 

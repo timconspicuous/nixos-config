@@ -1,0 +1,26 @@
+keys:
+  # Users - might set up a PGP key later
+  #users: &users
+  #  - &tim PGP_KEY_ID
+
+  # Hosts
+  hosts: &hosts
+    - &desktop age13d6egar7w7hq4cagemfu766p9g7l9j60z5afc6l4lt8w59kh5cfsh6ceal
+    #- &nucbox
+
+creation_rules:
+  - path_regex: secrets/desktop.ya?ml$
+    key_groups:
+      - age:
+          - *desktop
+
+  #- path_regex: secrets/nucbox.ya?ml$
+  #  key_groups:
+  #    - age:
+  #        - *nucbox
+
+  - path_regex: secrets/common.ya?ml$
+    key_groups:
+      - age:
+          - *desktop
+          #- *nucbox
