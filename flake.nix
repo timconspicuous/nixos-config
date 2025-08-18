@@ -41,9 +41,6 @@
             ./modules/desktop.nix
             ./modules/development.nix
             ./users/tim.nix
-            {
-              nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
-            }
           ];
         };
 
@@ -59,6 +56,9 @@
             ./modules/minecraft.nix
             ./modules/nginx.nix
             ./users/tim.nix
+            {
+              nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
+            }
           ];
         };
       };
