@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     sops-nix.url = "github:Mic92/sops-nix";
+    nix-minecraft.url = "github:Infinidoge/nix-minecraft";
 
     # Zen Browser
     zen-browser = {
@@ -23,6 +24,7 @@
       nixpkgs,
       zen-browser,
       grub2-themes,
+      nix-minecraft,
       ...
     }:
     {
@@ -38,7 +40,12 @@
             ./modules/common.nix
             ./modules/desktop.nix
             ./modules/development.nix
+            ./modules/minecraft.nix
             ./users/tim.nix
+            nix-minecraft.nixosModules.minecraft-servers
+            {
+              nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
+            }
           ];
         };
 
