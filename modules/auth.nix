@@ -77,28 +77,30 @@ in
     # SOPS configuration
     sops.secrets = {
       "authelia-jwt-secret" = {
-        sopsFile = ./secrets/common.yaml;
+        sopsFile = ../secrets/common.yaml;
         owner = "authelia";
         group = "authelia";
         mode = "0400";
       };
       "authelia-session-secret" = {
-        sopsFile = ./secrets/common.yaml;
+        sopsFile = ../secrets/common.yaml;
         owner = "authelia";
+        group = "authelia";
         mode = "0400";
       };
       "authelia-storage-encryption-key" = {
-        sopsFile = ./secrets/common.yaml;
+        sopsFile = ../secrets/common.yaml;
         owner = "authelia";
+        group = "authelia";
         mode = "0400";
       };
       "lldap-jwt-secret" = {
-        sopsFile = ./secrets/common.yaml;
+        sopsFile = ../secrets/common.yaml;
         owner = "lldap";
         mode = "0400";
       };
       "lldap-ldap-user-password" = {
-        sopsFile = ./secrets/common.yaml;
+        sopsFile = ../secrets/common.yaml;
         owner = "lldap";
         mode = "0400";
       };
@@ -146,9 +148,7 @@ in
       settings = {
         # Server configuration
         server = {
-          host = "0.0.0.0";
-          port = cfg.authelia.port;
-          path = "";
+          address = "tcp://0.0.0.0:${toString cfg.authelia.port}";
           asset_path = "";
         };
 

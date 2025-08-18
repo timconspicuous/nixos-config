@@ -42,6 +42,6 @@
   # services.openssh.enable = true;
 
   # Enable SOPS
-  sops.defaultSopsFile = ./secrets/secrets.yaml;
+  sops.defaultSopsFile = ../secrets/common.yaml;
   sops.age.keyFile = "~/.config/sops/age/keys.txt";
 }
