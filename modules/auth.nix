@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ config, lib, ... }:
 
 with lib;
 
@@ -78,30 +73,36 @@ in
     sops.secrets = {
       "authelia-jwt-secret" = {
         sopsFile = ../secrets/common.yaml;
+        key = "auth/authelia-jwt-secret";
         owner = "authelia";
         group = "authelia";
         mode = "0400";
       };
       "authelia-session-secret" = {
         sopsFile = ../secrets/common.yaml;
+        key = "auth/authelia-session-secret";
         owner = "authelia";
         group = "authelia";
         mode = "0400";
       };
       "authelia-storage-encryption-key" = {
         sopsFile = ../secrets/common.yaml;
+        key = "auth/authelia-storage-encryption-key";
         owner = "authelia";
         group = "authelia";
         mode = "0400";
       };
       "lldap-jwt-secret" = {
         sopsFile = ../secrets/common.yaml;
+        key = "auth/lldap-jwt-secret";
         owner = "lldap";
         mode = "0400";
       };
       "lldap-ldap-user-password" = {
         sopsFile = ../secrets/common.yaml;
+        key = "auth/lldap-ldap-user-password";
         owner = "lldap";
+        group = "authelia";
         mode = "0400";
       };
     };
@@ -111,8 +112,8 @@ in
       enable = true;
       settings = {
         # Load SOPS secrets
-        jwt_secret = config.sops.secrets.lldap-jwt-secret.path;
-        ldap_user_pass = config.sops.secrets.lldap-ldap-user-password.path;
+        jwt_secret = config.sops.secrets."lldap-jwt-secret".path;
+        ldap_user_pass = config.sops.secrets."lldap-ldap-user-password".path;
 
         http_port = cfg.lldap.port;
         ldap_port = cfg.lldap.ldapPort;
@@ -140,9 +141,9 @@ in
 
       # Load SOPS secrets
       secrets = {
-        jwtSecretFile = config.sops.secrets.authelia-jwt-secret.path;
-        storageEncryptionKeyFile = config.sops.secrets.authelia-storage-encryption-key.path;
-        sessionSecretFile = config.sops.secrets.authelia-session-secret.path;
+        jwtSecretFile = config.sops.secrets."authelia-jwt-secret".path;
+        sessionSecretFile = config.sops.secrets."authelia-session-secret".path;
+        storageEncryptionKeyFile = config.sops.secrets."authelia-storage-encryption-key".path;
       };
 
       settings = {
@@ -275,28 +276,5 @@ in
         "d /var/lib/authelia 0750 authelia authelia -"
       ])
     ];
-
-    # Optional: Add a simple nginx reverse proxy configuration
-    services.nginx = mkIf cfg.enable {
-      enable = mkDefault true;
-      virtualHosts = mkMerge [
-        (mkIf cfg.lldap.enable {
-          "lldap.${cfg.domain}" = {
-            locations."/" = {
-              proxyPass = "http://127.0.0.1:${toString cfg.lldap.port}";
-              proxyWebsockets = true;
-            };
-          };
-        })
-        (mkIf cfg.authelia.enable {
-          "${cfg.domain}" = {
-            locations."/" = {
-              proxyPass = "http://127.0.0.1:${toString cfg.authelia.port}";
-              proxyWebsockets = true;
-            };
-          };
-        })
-      ];
-    };
   };
 }
