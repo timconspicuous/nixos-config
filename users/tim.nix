@@ -38,7 +38,7 @@
   '';
 
   # SOPS config
-  sops.defaultSopsFile = ./secrets/common.yaml;
+  sops.defaultSopsFile = ../secrets/common.yaml;
   sops.defaultSopsFormat = "yaml";
   sops.age.keyFile = "/home/tim/.config/sops/age/keys.txt";
 
