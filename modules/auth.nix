@@ -69,41 +69,62 @@ in
   };
 
   config = mkIf cfg.enable {
-    # SOPS configuration
+    # Create users and groups first
+    users.users.lldap = mkIf cfg.lldap.enable {
+      isSystemUser = true;
+      group = "lldap";
+      home = "/var/lib/lldap";
+      createHome = true;
+    };
+
+    users.groups.lldap = mkIf cfg.lldap.enable { };
+
+    # Create authelia user (NixOS creates authelia-{instance} automatically, but we need to ensure proper user exists)
+    # The actual service runs as authelia-main for the "main" instance
+    users.users.authelia-main = mkIf cfg.authelia.enable {
+      isSystemUser = true;
+      group = "authelia-main";
+      home = "/var/lib/authelia-main";
+      createHome = true;
+    };
+
+    users.groups.authelia-main = mkIf cfg.authelia.enable { };
+
+    # SOPS configuration - now that users exist
     sops.secrets = {
-      "authelia-jwt-secret" = {
+      "authelia-jwt-secret" = mkIf cfg.authelia.enable {
         sopsFile = ../secrets/common.yaml;
         key = "auth/authelia-jwt-secret";
-        owner = "authelia";
-        group = "authelia";
+        owner = "authelia-main";
+        group = "authelia-main";
         mode = "0400";
       };
-      "authelia-session-secret" = {
+      "authelia-session-secret" = mkIf cfg.authelia.enable {
         sopsFile = ../secrets/common.yaml;
         key = "auth/authelia-session-secret";
-        owner = "authelia";
-        group = "authelia";
+        owner = "authelia-main";
+        group = "authelia-main";
         mode = "0400";
       };
-      "authelia-storage-encryption-key" = {
+      "authelia-storage-encryption-key" = mkIf cfg.authelia.enable {
         sopsFile = ../secrets/common.yaml;
         key = "auth/authelia-storage-encryption-key";
-        owner = "authelia";
-        group = "authelia";
+        owner = "authelia-main";
+        group = "authelia-main";
         mode = "0400";
       };
-      "lldap-jwt-secret" = {
+      "lldap-jwt-secret" = mkIf cfg.lldap.enable {
         sopsFile = ../secrets/common.yaml;
         key = "auth/lldap-jwt-secret";
         owner = "lldap";
         mode = "0400";
       };
-      "lldap-ldap-user-password" = {
+      "lldap-ldap-user-password" = mkIf cfg.lldap.enable {
         sopsFile = ../secrets/common.yaml;
         key = "auth/lldap-ldap-user-password";
         owner = "lldap";
-        group = "authelia";
-        mode = "0400";
+        group = "authelia-main"; # Allow authelia-main to read it
+        mode = "0440"; # Allow group to read
       };
     };
 
@@ -111,13 +132,8 @@ in
     services.lldap = mkIf cfg.lldap.enable {
       enable = true;
       settings = {
-        # Load SOPS secrets
-        jwt_secret = config.sops.secrets."lldap-jwt-secret".path;
-        ldap_user_pass = config.sops.secrets."lldap-ldap-user-password".path;
-
         http_port = cfg.lldap.port;
         ldap_port = cfg.lldap.ldapPort;
-
         ldap_base_dn = cfg.lldap.baseDn;
 
         # Database settings (using SQLite by default)
@@ -133,6 +149,12 @@ in
           port = 6360;
         };
       };
+
+      # Use environment variables for secrets
+      environment = {
+        LLDAP_JWT_SECRET_FILE = config.sops.secrets."lldap-jwt-secret".path;
+        LLDAP_LDAP_USER_PASS_FILE = config.sops.secrets."lldap-ldap-user-password".path;
+      };
     };
 
     # Authelia Configuration
@@ -145,6 +167,11 @@ in
         sessionSecretFile = config.sops.secrets."authelia-session-secret".path;
         storageEncryptionKeyFile = config.sops.secrets."authelia-storage-encryption-key".path;
       };
+
+      # Use environment variables for LDAP password - removed since we're using file: syntax
+      # environmentVariables = {
+      #   AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.sops.secrets."lldap-ldap-user-password".path;
+      # };
 
       settings = {
         # Server configuration
@@ -159,23 +186,26 @@ in
           format = "text";
         };
 
-        # Default redirection URL
-        default_redirection_url = "https://${cfg.domain}";
-
-        # Session configuration
+        # Session configuration - using new format
         session = {
           name = "authelia_session";
-          domain = cfg.domain;
           same_site = "lax";
           expiration = "1h";
           inactivity = "5m";
           remember_me = "1M";
+          cookies = [
+            {
+              domain = cfg.domain;
+              authelia_url = "https://${cfg.domain}";
+              default_redirection_url = "https://www.${cfg.domain}"; # Must be different from authelia_url
+            }
+          ];
         };
 
         # Storage configuration (SQLite)
         storage = {
           local = {
-            path = "/var/lib/authelia/db.sqlite3";
+            path = "/var/lib/authelia-main/db.sqlite3";
           };
         };
 
@@ -199,9 +229,10 @@ in
               group_name = "cn";
               mail = "mail";
               display_name = "displayName";
+              username = "uid";
             };
             user = "uid=${cfg.lldap.adminUsername},ou=people,${cfg.lldap.baseDn}";
-            password = "file:///run/secrets/lldap-ldap-user-password";
+            password = "file://${config.sops.secrets."lldap-ldap-user-password".path}";
           };
         };
 
@@ -244,21 +275,41 @@ in
           timeout = "60s";
         };
 
-        # Identity validation configuration
-        identity_validation = {
-          reset_password = {
-            jwt_secret = "file:///run/secrets/authelia-jwt-secret";
-          };
-        };
+        # Identity validation configuration - removed because it's handled by secrets section
+        # identity_validation = {
+        #   reset_password = {
+        #     jwt_secret = "file://${config.sops.secrets."authelia-jwt-secret".path}";
+        #   };
+        # };
 
         # Notifier (file-based for simplicity)
         notifier = {
           filesystem = {
-            filename = "/var/lib/authelia/notification.txt";
+            filename = "/var/lib/authelia-main/notification.txt";
           };
         };
       };
     };
+
+    # Ensure state directories exist with proper permissions
+    systemd.tmpfiles.rules = mkMerge [
+      (mkIf cfg.lldap.enable [
+        "d /var/lib/lldap 0750 lldap lldap -"
+      ])
+      (mkIf cfg.authelia.enable [
+        "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
+      ])
+    ];
+
+    # System service dependencies
+    systemd.services = mkMerge [
+      (mkIf cfg.authelia.enable {
+        authelia-main = {
+          after = [ "lldap.service" ];
+          wants = [ "lldap.service" ];
+        };
+      })
+    ];
 
     # Networking - Open required ports
     networking.firewall.allowedTCPPorts = mkMerge [
@@ -267,26 +318,6 @@ in
         cfg.lldap.ldapPort
       ])
       (mkIf cfg.authelia.enable [ cfg.authelia.port ])
-    ];
-
-    # System users and groups
-    users.users.lldap = mkIf cfg.lldap.enable {
-      isSystemUser = true;
-      group = "lldap";
-      home = "/var/lib/lldap";
-      createHome = true;
-    };
-
-    users.groups.lldap = mkIf cfg.lldap.enable { };
-
-    # Ensure state directories exist with proper permissions
-    systemd.tmpfiles.rules = mkMerge [
-      (mkIf cfg.lldap.enable [
-        "d /var/lib/lldap 0750 lldap lldap -"
-      ])
-      (mkIf cfg.authelia.enable [
-        "d /var/lib/authelia 0750 authelia authelia -"
-      ])
     ];
   };
 }
