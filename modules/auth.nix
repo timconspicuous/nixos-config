@@ -169,7 +169,7 @@ in
           same_site = "lax";
           expiration = "1h";
           inactivity = "5m";
-          remember_me_duration = "1M";
+          remember_me = "1M";
         };
 
         # Storage configuration (SQLite)
@@ -183,7 +183,7 @@ in
         authentication_backend = {
           ldap = {
             implementation = "custom";
-            url = "ldap://127.0.0.1:${toString cfg.lldap.ldapPort}";
+            address = "ldap://127.0.0.1:${toString cfg.lldap.ldapPort}";
             timeout = "5s";
             start_tls = false;
             tls = {
@@ -195,10 +195,13 @@ in
             users_filter = "(&({username_attribute}={input})(objectClass=person))";
             additional_groups_dn = "ou=groups";
             groups_filter = "(member={dn})";
-            group_name_attribute = "cn";
-            mail_attribute = "mail";
-            display_name_attribute = "displayName";
+            attributes = {
+              group_name = "cn";
+              mail = "mail";
+              display_name = "displayName";
+            };
             user = "uid=${cfg.lldap.adminUsername},ou=people,${cfg.lldap.baseDn}";
+            password = "file:///run/secrets/lldap-ldap-user-password";
           };
         };
 
@@ -235,8 +238,17 @@ in
         webauthn = {
           display_name = "Authelia";
           attestation_conveyance_preference = "indirect";
-          user_verification = "preferred";
+          selection_criteria = {
+            user_verification = "preferred";
+          };
           timeout = "60s";
+        };
+
+        # Identity validation configuration
+        identity_validation = {
+          reset_password = {
+            jwt_secret = "file:///run/secrets/authelia-jwt-secret";
+          };
         };
 
         # Notifier (file-based for simplicity)
