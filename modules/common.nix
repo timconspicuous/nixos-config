@@ -37,11 +37,4 @@
     sops
     wget
   ];
-
-  # Basic security
-  # services.openssh.enable = true;
-
-  # Enable SOPS
-  sops.defaultSopsFile = ../secrets/common.yaml;
-  sops.age.keyFile = "~/.config/sops/age/keys.txt";
 }
