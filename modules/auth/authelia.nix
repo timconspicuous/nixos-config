@@ -9,8 +9,6 @@ let
 in
 {
   options.services.homelab.auth.authelia = {
-    enable = mkEnableOption "Enable Authelia";
-
     port = mkOption {
       type = types.port;
       default = 9091;
@@ -42,21 +40,21 @@ in
     # SOPS secrets configuration
     sops.secrets = {
       "authelia-jwt-secret" = {
-        sopsFile = ../secrets/common.yaml;
+        sopsFile = ../../secrets/common.yaml;
         key = "auth/authelia-jwt-secret";
         owner = "authelia-main";
         group = "authelia-main";
         mode = "0400";
       };
       "authelia-session-secret" = {
-        sopsFile = ../secrets/common.yaml;
+        sopsFile = ../../secrets/common.yaml;
         key = "auth/authelia-session-secret";
         owner = "authelia-main";
         group = "authelia-main";
         mode = "0400";
       };
       "authelia-storage-encryption-key" = {
-        sopsFile = ../secrets/common.yaml;
+        sopsFile = ../../secrets/common.yaml;
         key = "auth/authelia-storage-encryption-key";
         owner = "authelia-main";
         group = "authelia-main";

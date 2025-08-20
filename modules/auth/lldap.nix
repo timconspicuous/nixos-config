@@ -8,8 +8,6 @@ let
 in
 {
   options.services.homelab.auth.lldap = {
-    enable = mkEnableOption "Enable LLDAP";
-
     port = mkOption {
       type = types.port;
       default = 17170;
@@ -49,13 +47,13 @@ in
     # SOPS secrets configuration
     sops.secrets = {
       "lldap-jwt-secret" = {
-        sopsFile = ../secrets/common.yaml;
+        sopsFile = ../../secrets/common.yaml;
         key = "auth/lldap-jwt-secret";
         owner = "lldap";
         mode = "0400";
       };
       "lldap-ldap-user-password" = {
-        sopsFile = ../secrets/common.yaml;
+        sopsFile = ../../secrets/common.yaml;
         key = "auth/lldap-ldap-user-password";
         owner = "lldap";
         group = "authelia-main"; # Allow authelia-main to read it
