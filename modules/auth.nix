@@ -40,7 +40,7 @@ in
 
       adminUsername = mkOption {
         type = types.str;
-        default = "admin";
+        default = "lldap_admin";
         description = "LLDAP admin username";
       };
     };
@@ -135,6 +135,7 @@ in
         http_port = cfg.lldap.port;
         ldap_port = cfg.lldap.ldapPort;
         ldap_base_dn = cfg.lldap.baseDn;
+        ldap_user_email = "${cfg.lldap.adminUsername}@${cfg.domain}"; # Add admin email
 
         # Database settings (using SQLite by default)
         database_url = "sqlite:///var/lib/lldap/users.db";
@@ -303,6 +304,13 @@ in
 
     # System service dependencies
     systemd.services = mkMerge [
+      (mkIf cfg.lldap.enable {
+        lldap = {
+          # DynamicUser screws up sops-nix ownership because
+          # the user doesn't exist outside of runtime.
+          serviceConfig.DynamicUser = mkForce false;
+        };
+      })
       (mkIf cfg.authelia.enable {
         authelia-main = {
           after = [ "lldap.service" ];

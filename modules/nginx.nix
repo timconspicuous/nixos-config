@@ -1,14 +1,9 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}:
+{ ... }:
 
 {
   services.nginx = {
     enable = true;
-    
+
     # TCP/UDP traffic
     appendConfig = ''
       stream {
@@ -40,4 +35,27 @@
     443
     25565
   ];
+
+  # Optional: Add a simple nginx reverse proxy configuration
+  # services.nginx = mkIf cfg.enable {
+  #   enable = mkDefault true;
+  #   virtualHosts = mkMerge [
+  #     (mkIf cfg.lldap.enable {
+  #       "lldap.${cfg.domain}" = {
+  #         locations."/" = {
+  #           proxyPass = "http://127.0.0.1:${toString cfg.lldap.port}";
+  #           proxyWebsockets = true;
+  #         };
+  #       };
+  #     })
+  #     (mkIf cfg.authelia.enable {
+  #       "${cfg.domain}" = {
+  #         locations."/" = {
+  #           proxyPass = "http://127.0.0.1:${toString cfg.authelia.port}";
+  #           proxyWebsockets = true;
+  #         };
+  #       };
+  #     })
+  #   ];
+  # };
 }
