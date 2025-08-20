@@ -4,7 +4,6 @@ with lib;
 
 let
   cfg = config.services.homelab.auth.lldap;
-  authCfg = config.services.homelab.auth;
 in
 {
   options.services.homelab.auth.lldap = {
@@ -68,7 +67,7 @@ in
         http_port = cfg.port;
         ldap_port = cfg.ldapPort;
         ldap_base_dn = cfg.baseDn;
-        ldap_user_email = "${cfg.adminUsername}@${authCfg.domain}";
+        ldap_user_dn = cfg.adminUsername;
 
         # Database settings (using SQLite by default)
         database_url = "sqlite:///var/lib/lldap/users.db";
