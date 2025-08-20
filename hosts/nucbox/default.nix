@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -22,7 +27,17 @@
 
   # Enable printing for desktop
   services.printing.enable = true;
-  
+
   # SSH
   services.openssh.enable = true;
+
+  # Enable the auth services
+  services.homelab.auth = {
+    enable = true;
+    domain = "auth.timtinkers.online";
+
+    # Optional: customize LDAP settings
+    lldap.baseDn = "dc=timtinkers,dc=online";
+    lldap.adminUsername = "tim";
+  };
 }

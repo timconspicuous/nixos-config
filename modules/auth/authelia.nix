@@ -73,6 +73,12 @@ in
         storageEncryptionKeyFile = config.sops.secrets."authelia-storage-encryption-key".path;
       };
 
+      # Use environment variables for LDAP password
+      environmentVariables = {
+        AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE =
+          config.sops.secrets."lldap-ldap-user-password".path;
+      };
+
       settings = {
         # Server configuration
         server = {
@@ -97,7 +103,7 @@ in
             {
               domain = authCfg.domain;
               authelia_url = "https://${authCfg.domain}";
-              default_redirection_url = "https://www.${authCfg.domain}"; # Must be different from authelia_url
+              default_redirection_url = "https://home.timtinkers.online";
             }
           ];
         };
@@ -132,7 +138,7 @@ in
               username = "uid";
             };
             user = "uid=${lldapCfg.adminUsername},ou=people,${lldapCfg.baseDn}";
-            password = "file://${config.sops.secrets."lldap-ldap-user-password".path}";
+            # Password loaded from environment variable AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
           };
         };
 

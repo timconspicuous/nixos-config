@@ -37,7 +37,6 @@
             grub2-themes.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/desktop
-            ./modules/auth/default.nix
             ./modules/common.nix
             ./modules/desktop.nix
             ./modules/development.nix
@@ -53,6 +52,7 @@
             nix-minecraft.nixosModules.minecraft-servers
             inputs.sops-nix.nixosModules.sops
             ./hosts/nucbox
+            ./modules/auth/default.nix
             ./modules/common.nix
             ./modules/minecraft.nix
             ./modules/nginx.nix
