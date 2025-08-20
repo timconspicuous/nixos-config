@@ -93,6 +93,7 @@ in
     # Ensure state directories exist with proper permissions
     systemd.tmpfiles.rules = [
       "d /var/lib/lldap 0750 lldap lldap -"
+      "f /var/lib/lldap/users.db 0640 lldap lldap -"
     ];
 
     # System service configuration

@@ -103,7 +103,7 @@ in
             {
               domain = authCfg.domain;
               authelia_url = "https://${authCfg.domain}";
-              default_redirection_url = "https://home.timtinkers.online";
+              # default_redirection_url = "https://home.timtinkers.online";
             }
           ];
         };
