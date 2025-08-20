@@ -2,6 +2,11 @@
 
 {
   services.nginx = {
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "git@timtinkers.online";
+    };
+
     enable = true;
 
     virtualHosts."auth.timtinkers.online" = {
