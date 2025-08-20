@@ -49,4 +49,10 @@
     group = "users";
     mode = "0600";
   };
+
+  # ACME config
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "git@timtinkers.online";
+  };
 }
