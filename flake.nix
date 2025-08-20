@@ -37,7 +37,7 @@
             grub2-themes.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/desktop
-            ./modules/auth.nix
+            ./modules/auth/default.nix
             ./modules/common.nix
             ./modules/desktop.nix
             ./modules/development.nix
