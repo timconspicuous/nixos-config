@@ -49,14 +49,10 @@
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
-            nix-minecraft.nixosModules.minecraft-servers
             inputs.sops-nix.nixosModules.sops
             ./hosts/nucbox
             ./modules/default.nix
             ./users/tim.nix
-            {
-              nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];
-            }
           ];
         };
       };

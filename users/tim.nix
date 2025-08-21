@@ -33,7 +33,7 @@
     Host tangled.sh
       HostName tangled.sh
       User git
-      IdentityFile /home/tim/.ssh/tangled
+      IdentityFile /home/tim/.ssh/id_ed25519
       IdentitiesOnly yes
   '';
 
@@ -44,7 +44,7 @@
 
   # Tangled SSH key
   sops.secrets."ssh/tangled" = {
-    path = "/home/tim/.ssh/tangled";
+    path = "/home/tim/.ssh/id_ed25519";
     owner = "tim";
     group = "users";
     mode = "0600";

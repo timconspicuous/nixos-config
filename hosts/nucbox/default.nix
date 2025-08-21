@@ -23,8 +23,10 @@
   # Enable printing for desktop
   services.printing.enable = true;
 
-  # SSH
-  services.openssh.enable = true;
+  # Enable Nginx
+  services.homelab.nginx = {
+    enable = true;
+  };
 
   # Enable the auth services
   services.homelab.auth = {
@@ -35,10 +37,16 @@
     lldap.baseDn = "dc=timtinkers,dc=online";
     lldap.adminUsername = "tim";
   };
-  
+
   # Enable homepage dashboard
   services.homelab.homepage = {
     enable = true;
+    allowedHosts = [
+      "localhost:8082"
+      "127.0.0.1:8082"
+      "home.timtinkers.online"
+      "192.168.2.230:8082"
+    ];
   };
 
   # Enable Fabric server

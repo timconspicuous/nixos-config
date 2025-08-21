@@ -3,10 +3,10 @@
 with lib;
 
 let
-  cfg = config.services.myNginx;
+  cfg = config.services.homelab.nginx;
 in
 {
-  options.services.myNginx = {
+  options.services.homelab.nginx = {
     enable = mkEnableOption "custom nginx configuration";
 
     domain = mkOption {
@@ -84,35 +84,36 @@ in
       # Generate virtualHosts from reverseProxies
       virtualHosts =
         # Individual reverse proxy hosts
-        (mapAttrs (name: proxy: {
-          serverName = "${proxy.subdomain}.${cfg.domain}";
-          enableACME = true;
-          forceSSL = true;
-          locations."/" = {
-            proxyPass = proxy.target;
-            proxyWebsockets = proxy.websockets;
-            extraConfig = "proxy_ssl_server_name on;" + "proxy_pass_header Authorization;" + proxy.extraConfig;
-          };
-        }) cfg.reverseProxies)
-
-        //
-
-          # Default catch-all site
-          (optionalAttrs cfg.defaultSite {
-            "_" = {
-              serverName = "_.${cfg.domain}";
-              default = true;
-              enableACME = true;
-              forceSSL = true;
-              locations."/" = {
-                return = "404";
-                extraConfig = ''
-                  add_header Content-Type text/plain;
-                  return 404 "Service not found";
-                '';
-              };
+        (
+          mapAttrs (name: proxy: {
+            serverName = "${proxy.subdomain}.${cfg.domain}";
+            enableACME = true;
+            forceSSL = true;
+            locations."/" = {
+              proxyPass = proxy.target;
+              proxyWebsockets = proxy.websockets;
+              extraConfig = "proxy_ssl_server_name on;" + "proxy_pass_header Authorization;" + proxy.extraConfig;
             };
-          });
+          }) cfg.reverseProxies
+        );
+
+      # Default catch-all site disabled for now
+      # //
+      # (optionalAttrs cfg.defaultSite {
+      #   "default.${cfg.domain}" = {
+      #     serverName = "default.${cfg.domain}";
+      #     default = true;
+      #     enableACME = true;
+      #     forceSSL = true;
+      #     locations."/" = {
+      #       return = "404";
+      #       extraConfig = ''
+      #         add_header Content-Type text/plain;
+      #         return 404 "Service not found";
+      #       '';
+      #     };
+      #   };
+      # });
 
       # Generate stream configuration if we have stream proxies
       appendConfig = mkIf (cfg.streamProxies != { }) ''
@@ -122,21 +123,20 @@ in
             ${concatStringsSep "\n    " (
               mapAttrsToList (name: proxy: "${proxy.subdomain}.${cfg.domain} ${proxy.target};") cfg.streamProxies
             )}
-            # Default fallback to first proxy or deny
-            default ${
-              if cfg.streamProxies != { } then (head (attrValues cfg.streamProxies)).target else "127.0.0.1:1" # Will fail, no default
-            };
+            # Default fallback
+            default 127.0.0.1:1;
           }
 
+          # Group stream proxies by port and create server blocks
           ${concatStringsSep "\n  " (
-            mapAttrsToList (name: proxy: ''
+            mapAttrsToList (port: proxies: ''
               server {
-                listen ${toString proxy.port};
+                listen ${port};
                 proxy_pass $backend_pool;
                 proxy_timeout 1s;
                 proxy_responses 1;
                 ssl_preread on;
-                error_log /var/log/nginx/${name}_error.log;
+                error_log /var/log/nginx/stream_${port}_error.log;
               }
             '') (groupBy (proxy: toString proxy.port) (attrValues cfg.streamProxies))
           )}

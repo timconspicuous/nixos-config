@@ -35,6 +35,9 @@
 
   # Basic networking
   networking.networkmanager.enable = true;
+  
+  # SSH
+  services.openssh.enable = true;
 
   # Essential packages for all systems
   environment.systemPackages = with pkgs; [

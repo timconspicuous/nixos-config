@@ -8,11 +8,11 @@
 with lib;
 
 let
-  cfg = config.services.myServices.minecraft.fabric;
-  minecraftCfg = config.services.myServices.minecraft;
+  cfg = config.services.homelab.minecraft.fabric;
+  minecraftCfg = config.services.homelab.minecraft;
 in
 {
-  options.services.myServices.minecraft.fabric = {
+  options.services.homelab.minecraft.fabric = {
     enable = mkEnableOption "Fabric Minecraft server";
 
     port = mkOption {
@@ -141,7 +141,7 @@ in
     };
 
     # Register stream proxy with nginx only if reverse proxy is enabled
-    services.my-nginx.streamProxies = mkIf cfg.enableReverseProxy {
+    services.homelab.nginx.streamProxies = mkIf cfg.enableReverseProxy {
       fabric = {
         subdomain = cfg.subdomain;
         target = "127.0.0.1:${toString cfg.port}";
