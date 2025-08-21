@@ -37,7 +37,7 @@
             grub2-themes.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/desktop
-            ./modules/common.nix
+            ./modules/default.nix
             ./modules/desktop.nix
             ./modules/development.nix
             ./users/tim.nix
@@ -52,10 +52,7 @@
             nix-minecraft.nixosModules.minecraft-servers
             inputs.sops-nix.nixosModules.sops
             ./hosts/nucbox
-            ./modules/auth/default.nix
-            ./modules/common.nix
-            ./modules/minecraft.nix
-            ./modules/nginx.nix
+            ./modules/default.nix
             ./users/tim.nix
             {
               nixpkgs.overlays = [ inputs.nix-minecraft.overlay ];

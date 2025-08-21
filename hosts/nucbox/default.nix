@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}:
+{ ... }:
 
 {
   imports = [
@@ -33,11 +28,37 @@
 
   # Enable the auth services
   services.homelab.auth = {
-    enable = true;
+    enable = false;
     domain = "auth.timtinkers.online";
 
     # Optional: customize LDAP settings
     lldap.baseDn = "dc=timtinkers,dc=online";
     lldap.adminUsername = "tim";
+  };
+  
+  # Enable homepage dashboard
+  services.homelab.homepage = {
+    enable = true;
+  };
+
+  # Enable Fabric server
+  services.homelab.minecraft = {
+    enable = true;
+
+    fabric = {
+      enable = true;
+      port = 25566;
+      enableReverseProxy = true;
+      subdomain = "minecraft";
+
+      maxMemory = "6G";
+      minMemory = "2G";
+      maxPlayers = 5;
+      difficulty = 3;
+      motd = "tim's NixOS server";
+
+      mods = import ../../modules/minecraft/mods.nix;
+      whitelist = import ../../modules/minecraft/whitelist.nix;
+    };
   };
 }

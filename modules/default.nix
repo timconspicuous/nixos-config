@@ -1,6 +1,13 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
+  imports = [
+    ./nginx.nix
+    ./auth/default.nix
+    ./homepage/default.nix
+    ./minecraft/default.nix
+  ];
+  
   # Basic system settings
   time.timeZone = "Europe/Berlin";
 
