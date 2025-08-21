@@ -89,6 +89,13 @@ in
       description = "Mods to install on the server";
     };
 
+    # Favicon option
+    favicon = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = "Path to a PNG favicon file (64x64 recommended)";
+    };
+
     # Fabric-specific options
     fabricVersion = mkOption {
       type = types.str;
@@ -113,18 +120,26 @@ in
         loaderVersion = cfg.loaderVersion;
       };
 
-      # Create mod symlinks from our mod definitions
-      symlinks = mkIf (cfg.mods != { }) {
-        mods = pkgs.linkFarmFromDrvs "mods" (
-          mapAttrsToList (
-            name: mod:
-            pkgs.fetchurl {
-              url = mod.url;
-              sha512 = mod.sha512;
-            }
-          ) cfg.mods
-        );
-      };
+      # Create symlinks for mods and favicon
+      symlinks = mkMerge [
+        # Mods symlink
+        (mkIf (cfg.mods != { }) {
+          mods = pkgs.linkFarmFromDrvs "mods" (
+            mapAttrsToList (
+              name: mod:
+              pkgs.fetchurl {
+                url = mod.url;
+                sha512 = mod.sha512;
+              }
+            ) cfg.mods
+          );
+        })
+
+        # Favicon symlink
+        (mkIf (cfg.favicon != null) {
+          "server-icon.png" = cfg.favicon;
+        })
+      ];
 
       jvmOpts = "-Xms${cfg.minMemory} -Xmx${cfg.maxMemory} -Dfml.readTimeout=180";
 
@@ -141,11 +156,10 @@ in
     };
 
     # Register stream proxy with nginx only if reverse proxy is enabled
-    services.homelab.nginx.streamProxies = mkIf cfg.enableReverseProxy {
+    services.homelab.gate.reverseProxies = mkIf cfg.enableReverseProxy {
       fabric = {
         subdomain = cfg.subdomain;
         target = "127.0.0.1:${toString cfg.port}";
-        port = 25565;
       };
     };
   };

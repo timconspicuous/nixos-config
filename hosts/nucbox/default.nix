@@ -28,6 +28,13 @@
     enable = true;
   };
 
+  # Enable Gate
+  services.homelab.gate = {
+    enable = true;
+    domain = "timtinkers.online";
+    favicon = ../../modules/proxy/favicon.png;
+  };
+
   # Enable the auth services
   services.homelab.auth = {
     enable = false;
@@ -67,6 +74,7 @@
 
       mods = import ../../modules/minecraft/mods.nix;
       whitelist = import ../../modules/minecraft/whitelist.nix;
+      favicon = ../../modules/proxy/favicon.png;
     };
   };
 }

@@ -2,10 +2,10 @@
 
 {
   imports = [
-    ./nginx.nix
     ./auth/default.nix
     ./homepage/default.nix
     ./minecraft/default.nix
+    ./proxy/default.nix
   ];
   
   # Basic system settings
