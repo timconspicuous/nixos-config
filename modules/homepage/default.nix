@@ -60,6 +60,7 @@ in
       bookmarks = importYaml ./bookmarks.yaml;
       settings = importYaml ./settings.yaml;
       services = importYaml ./services.yaml;
+      widgets = importYaml ./widgets.yaml;
       listenPort = cfg.listenPort;
       allowedHosts = concatStringsSep "," cfg.allowedHosts;
     };

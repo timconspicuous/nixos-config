@@ -1,5 +1,6 @@
 # Global settings
 title: tim's dashboard
+description: A dashboard containing all the servers running on Tim's homelab
 favicon: https://nixos.org/favicon.ico
 background: https://images.unsplash.com/photo-1672288072591-619afe830096?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
 backgroundOpacity: 0.5

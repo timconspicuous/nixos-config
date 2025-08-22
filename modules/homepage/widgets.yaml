@@ -1,0 +1,11 @@
+- logo:
+    icon: https://nixos.org/favicon.ico
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+
+- search:
+    provider: google
+    target: _blank

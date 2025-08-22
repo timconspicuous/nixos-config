@@ -3,38 +3,52 @@
         icon: calibre
         href: https://calibre.timtinkers.online
         description: E-Book Library
+        siteMonitor: https://calibre.timtinkers.online
+        statusStyle: dot
     - audiobookshelf:
         icon: audiobookshelf
         href: https://audiobookshelf.timtinkers.online
         description: Audiobook Library
+        siteMonitor: https://audiobookshelf.timtinkers.online
+        statusStyle: dot
 - Auth:
     - Authelia:
         icon: authelia
         href: https://auth.timtinkers.online
         description: Single Sign-On
+        siteMonitor: https://auth.timtinkers.online
+        statusStyle: dot
     - LLDAP:
-        icon: authelia
+        icon: sh-lldap
         href: https://lldap.timtinkers.online
         description: Authentication Server
+        siteMonitor: https://lldap.timtinkers.online
+        statusStyle: dot
 - Cloud:
     - ownCloud:
         icon: owncloud
         href: https://cloud.timtinkers.online
         description: Cloud Storage
+        siteMonitor: https://cloud.timtinkers.online
+        statusStyle: dot
 - Media:
     - Jellyfin:
         icon: jellyfin
         href: https://jellyfin.timtinkers.online
         description: Media Server
+        siteMonitor: https://jellyfin.timtinkers.online
+        statusStyle: dot
     - Immich:
         icon: immich
         href: https://immich.timtinkers.online
         description: Photo Cloud
+        siteMonitor: https://immich.timtinkers.online
+        statusStyle: dot
 - Game Servers:
-    - Fabric:
-        icon: minecraft.png
+    - minecraft.timtinkers.online:
+        icon: minecraft
         href: https://minecraft.timtinkers.online
-        description: Fabric Server
+        description: Fabric Minecraft Server
         widget:
           type: minecraft
           url: https://minecraft.timtinkers.online
@@ -43,3 +57,5 @@
         icon: bluesky
         href: https://pds.timtinkers.online
         description: Bluesky Personal Data Server
+        siteMonitor: https://pds.timtinkers.online
+        statusStyle: dot
