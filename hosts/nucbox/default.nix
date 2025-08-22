@@ -4,6 +4,11 @@
   imports = [
     ./hardware-configuration.nix
   ];
+  
+  # Mounting the media storage drive here
+  systemd.tmpfiles.rules = [
+    "d /srv/media 0755 tim users -"
+  ];
 
   # System identification
   networking.hostName = "nucbox";
