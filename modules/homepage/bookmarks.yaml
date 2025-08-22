@@ -1,0 +1,21 @@
+- Bookmarks:
+    - "My Flake on Tangled":
+        - abbr: "FL"
+          href: "https://tangled.sh/@timtinkers.online/nixos-config"
+          icon: "https://tangled.sh/favicon.ico"
+    - "NixOS Search":
+        - abbr: "NIX"
+          href: "https://search.nixos.org/"
+          icon: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nixos.svg"
+    - "NixOS Wiki":
+        - abbr: "NIX"
+          href: "https://nixos.wiki/"
+          icon: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nixos.svg"
+    - "Homepage Docs":
+        - abbr: "HP"
+          href: "https://gethomepage.dev/configs/"
+          icon: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/homepage.png"
+    - "Namecheap":
+        - abbr: "NC"
+          href: "https://www.namecheap.com/"
+          icon: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/namecheap.svg"

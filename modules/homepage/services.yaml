@@ -1,0 +1,45 @@
+- Books:
+    - Calibre:
+        icon: calibre
+        href: https://calibre.timtinkers.online
+        description: E-Book Library
+    - audiobookshelf:
+        icon: audiobookshelf
+        href: https://audiobookshelf.timtinkers.online
+        description: Audiobook Library
+- Auth:
+    - Authelia:
+        icon: authelia
+        href: https://auth.timtinkers.online
+        description: Single Sign-On
+    - LLDAP:
+        icon: authelia
+        href: https://lldap.timtinkers.online
+        description: Authentication Server
+- Cloud:
+    - ownCloud:
+        icon: owncloud
+        href: https://cloud.timtinkers.online
+        description: Cloud Storage
+- Media:
+    - Jellyfin:
+        icon: jellyfin
+        href: https://jellyfin.timtinkers.online
+        description: Media Server
+    - Immich:
+        icon: immich
+        href: https://immich.timtinkers.online
+        description: Photo Cloud
+- Game Servers:
+    - Fabric:
+        icon: minecraft.png
+        href: https://minecraft.timtinkers.online
+        description: Fabric Server
+        widget:
+          type: minecraft
+          url: https://minecraft.timtinkers.online
+- PDS:
+    - PDS:
+        icon: bluesky
+        href: https://pds.timtinkers.online
+        description: Bluesky Personal Data Server

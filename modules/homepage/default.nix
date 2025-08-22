@@ -1,9 +1,29 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
 let
   cfg = config.services.homelab.homepage;
+
+  # Helper function to convert YAML to JSON and import
+  importYaml =
+    yamlFile:
+    let
+      jsonFile =
+        pkgs.runCommand "yaml-to-json"
+          {
+            buildInputs = [ pkgs.yq-go ];
+          }
+          ''
+            yq eval -o=json ${yamlFile} > $out
+          '';
+    in
+    builtins.fromJSON (builtins.readFile jsonFile);
 in
 {
   options.services.homelab.homepage = {
@@ -37,9 +57,9 @@ in
     services.homepage-dashboard = {
       enable = true;
       openFirewall = true;
-      bookmarks = import ./bookmarks.nix;
-      settings = import ./settings.nix;
-      services = import ./services.nix;
+      bookmarks = importYaml ./bookmarks.yaml;
+      settings = importYaml ./settings.yaml;
+      services = importYaml ./services.yaml;
       listenPort = cfg.listenPort;
       allowedHosts = concatStringsSep "," cfg.allowedHosts;
     };
