@@ -5,6 +5,7 @@ with lib;
 let
   cfg = config.services.homelab.auth.authelia;
   lldapCfg = config.services.homelab.auth.lldap;
+  nginxCfg = config.services.homelab.nginx;
 in
 {
   options.services.homelab.auth.authelia = {
@@ -97,6 +98,14 @@ in
         server = {
           address = "tcp://0.0.0.0:${toString cfg.port}";
           asset_path = "";
+          # Add the endpoints configuration for auth-request
+          endpoints = {
+            authz = {
+              "auth-request" = {
+                implementation = "AuthRequest";
+              };
+            };
+          };
         };
 
         # Logging
@@ -105,18 +114,20 @@ in
           format = "text";
         };
 
-        # Session configuration - using new format
+        # Session configuration
         session = {
+          # Global session settings
           name = "authelia_session";
           same_site = "lax";
           expiration = "1h";
           inactivity = "5m";
           remember_me = "1M";
+
           cookies = [
             {
-              domain = cfg.domain;
-              authelia_url = "https://${cfg.domain}";
-              # default_redirection_url = "https://home.timtinkers.online";
+              domain = "${nginxCfg.domain}"; # "timtinkers.online" - no dot prefix
+              authelia_url = "https://${cfg.domain}"; # "https://auth.timtinkers.online"
+              default_redirection_url = "https://home.${nginxCfg.domain}";
             }
           ];
         };
@@ -151,7 +162,6 @@ in
               username = "uid";
             };
             user = "uid=${lldapCfg.adminUsername},ou=people,${lldapCfg.baseDn}";
-            # Password loaded from environment variable AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
           };
         };
 
@@ -159,14 +169,23 @@ in
         access_control = {
           default_policy = "deny";
           rules = [
+            # Allow Authelia's own domain
             {
               domain = [ cfg.domain ];
+              policy = "bypass";
+            }
+            # Allow internal health checks and API calls
+            {
+              domain = [
+                "localhost"
+                "127.0.0.1"
+              ];
               policy = "bypass";
             }
           ]
           ++ (map (domain: {
             domain = [ domain ];
-            policy = "two_factor";
+            policy = "one_factor";
           }) cfg.protectedDomains);
         };
 
@@ -184,14 +203,14 @@ in
           skew = 1;
         };
 
-        # WebAuthn Configuration
+        # WebAuthn Configuration - FIXED
         webauthn = {
           display_name = "Authelia";
           attestation_conveyance_preference = "indirect";
+          timeout = "60s";
           selection_criteria = {
             user_verification = "preferred";
           };
-          timeout = "60s";
         };
 
         # Notifier (file-based for simplicity)
