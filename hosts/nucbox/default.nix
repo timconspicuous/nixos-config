@@ -4,7 +4,7 @@
   imports = [
     ./hardware-configuration.nix
   ];
-  
+
   # Mounting the media storage drive here
   systemd.tmpfiles.rules = [
     "d /srv/media 0755 tim users -"
@@ -27,6 +27,18 @@
 
   # Enable printing for desktop
   services.printing.enable = true;
+
+  # NFS sharing
+  services.nfs.server = {
+    enable = true;
+    extraNfsdConfig = "--no-nfs-version 3 --no-nfs-version 2";
+
+    exports = ''
+      /srv/media/books 192.168.2.0/24(rw,sync,no_subtree_check)
+      /srv/media/jellyfin 192.168.2.0/24(rw,sync,no_subtree_check)
+    '';
+  };
+  networking.firewall.allowedTCPPorts = [ 2049 ];
 
   # Enable Nginx
   services.homelab.nginx = {
