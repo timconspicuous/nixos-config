@@ -3,6 +3,7 @@
 {
   imports = [
     ./auth/default.nix
+    ./books/default.nix
     ./homepage/default.nix
     ./minecraft/default.nix
     ./proxy/default.nix

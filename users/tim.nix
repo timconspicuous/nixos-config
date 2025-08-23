@@ -11,6 +11,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "calibre"
       "minecraft"
     ];
   };

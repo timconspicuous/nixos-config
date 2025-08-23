@@ -94,4 +94,11 @@
       favicon = ../../modules/proxy/favicon.png;
     };
   };
+  
+  # Enable homepage dashboard
+  services.homelab.calibre = {
+    enable = true;
+    port = 8880;
+    libraries = [ "/srv/media/books/calibre/tim" ];
+  };
 }
