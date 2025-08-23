@@ -7,6 +7,8 @@ let
 in
 {
   options.services.homelab.auth.lldap = {
+    enable = mkEnableOption "LLDAP";
+
     port = mkOption {
       type = types.port;
       default = 17170;
@@ -29,6 +31,12 @@ in
       type = types.str;
       default = "lldap_admin";
       description = "LLDAP admin username";
+    };
+
+    enableReverseProxy = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable reverse proxy for this service";
     };
   };
 
@@ -108,5 +116,14 @@ in
       cfg.port
       cfg.ldapPort
     ];
+
+    # Register with nginx only if reverse proxy is enabled
+    services.homelab.nginx.reverseProxies = mkIf cfg.enableReverseProxy {
+      lldap = {
+        subdomain = "lldap";
+        target = "http://127.0.0.1:${toString cfg.port}";
+        websockets = true;
+      };
+    };
   };
 }

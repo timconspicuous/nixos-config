@@ -54,12 +54,17 @@
 
   # Enable the auth services
   services.homelab.auth = {
-    enable = false;
-    domain = "auth.timtinkers.online";
+    authelia = {
+      enable = true;
+      domain = "auth.timtinkers.online";
+      protectedDomains = [ "calibre.timtinkers.online" ];
+    };
 
-    # Optional: customize LDAP settings
-    lldap.baseDn = "dc=timtinkers,dc=online";
-    lldap.adminUsername = "tim";
+    lldap = {
+      enable = true;
+      baseDn = "dc=timtinkers,dc=online";
+      adminUsername = "tim";
+    };
   };
 
   # Enable homepage dashboard
@@ -94,7 +99,7 @@
       favicon = ../../modules/proxy/favicon.png;
     };
   };
-  
+
   # Enable homepage dashboard
   services.homelab.calibre = {
     enable = true;

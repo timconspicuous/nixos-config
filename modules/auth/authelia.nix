@@ -4,15 +4,22 @@ with lib;
 
 let
   cfg = config.services.homelab.auth.authelia;
-  authCfg = config.services.homelab.auth;
   lldapCfg = config.services.homelab.auth.lldap;
 in
 {
   options.services.homelab.auth.authelia = {
+    enable = mkEnableOption "Authelia";
+
     port = mkOption {
       type = types.port;
       default = 9091;
       description = "Port for Authelia";
+    };
+
+    domain = mkOption {
+      type = types.str;
+      default = "auth.local";
+      description = "Domain for Authelia";
     };
 
     protectedDomains = mkOption {
@@ -23,6 +30,12 @@ in
         "calibre.local"
         "nextcloud.local"
       ];
+    };
+
+    enableReverseProxy = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enable reverse proxy for this service";
     };
   };
 
@@ -101,8 +114,8 @@ in
           remember_me = "1M";
           cookies = [
             {
-              domain = authCfg.domain;
-              authelia_url = "https://${authCfg.domain}";
+              domain = cfg.domain;
+              authelia_url = "https://${cfg.domain}";
               # default_redirection_url = "https://home.timtinkers.online";
             }
           ];
@@ -147,7 +160,7 @@ in
           default_policy = "deny";
           rules = [
             {
-              domain = [ authCfg.domain ];
+              domain = [ cfg.domain ];
               policy = "bypass";
             }
           ]
@@ -203,5 +216,14 @@ in
 
     # Networking - Open required ports
     networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+    # Register with nginx only if reverse proxy is enabled
+    services.homelab.nginx.reverseProxies = mkIf cfg.enableReverseProxy {
+      authelia = {
+        subdomain = "auth";
+        target = "http://127.0.0.1:${toString cfg.port}";
+        websockets = true;
+      };
+    };
   };
 }
