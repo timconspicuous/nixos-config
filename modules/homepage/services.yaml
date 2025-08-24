@@ -56,6 +56,6 @@
     - PDS:
         icon: bluesky
         href: https://pds.timtinkers.online
-        description: Bluesky Personal Data Server
+        description: AT Proto Personal Data Server
         siteMonitor: https://pds.timtinkers.online
         statusStyle: dot

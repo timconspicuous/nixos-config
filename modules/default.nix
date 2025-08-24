@@ -7,6 +7,7 @@
     ./homepage/default.nix
     ./minecraft/default.nix
     ./proxy/default.nix
+    ./atproto-pds.nix
   ];
   
   # Basic system settings

@@ -106,4 +106,11 @@
     port = 8880;
     libraries = [ "/srv/media/books/calibre/tim" ];
   };
+  
+  # Enable homepage dashboard
+  services.homelab.pds = {
+    enable = true;
+    port = 3001;
+    domain = "pds.timtinkers.online";
+  };
 }
